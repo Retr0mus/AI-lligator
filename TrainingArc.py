@@ -11,12 +11,15 @@ datagen = ImageDataGenerator(
     width_shift_range=0.2, # Sposto le immagini orizzontalmente di una frazione casuale tra -0.2 e 0.2
     height_shift_range=0.2, # Sposto le immagini verticalmente di una frazione casuale tra -0.2 e 0.2
     horizontal_flip=True, # Capovolgo le immagini orizzontalmente con una probabilità del 50%
-    validation_split=0.2 # Imposto una frazione del 20% delle immagini come dati di validazione
+    validation_split=0.2, # Imposto una frazione del 20% delle immagini come dati di validazione
+    shear_range=0.2,
+    zoom_range=0.2,
+    fill_mode='nearest'
 )
 
 # Creo due generatori di flusso dalle cartelle delle immagini di training e validazione
 train_generator = datagen.flow_from_directory(
-    directory='crocodile_vs_alligator', # La cartella che contiene le sottocartelle delle classi
+    directory='dataset-serio/training', # La cartella che contiene le sottocartelle delle classi
     target_size=(256, 256), # La dimensione delle immagini da ridimensionare
     batch_size=32, # Il numero di immagini per ogni batch
     class_mode='binary', # La modalità di etichettatura delle classi (0 per coccodrillo, 1 per alligatore)
@@ -24,12 +27,12 @@ train_generator = datagen.flow_from_directory(
 )
 
 validation_generator = datagen.flow_from_directory(
-    directory='crocodile_vs_alligator', # La stessa cartella del training
+    directory='dataset-serio/testing', # La stessa cartella del training
     target_size=(256, 256), # La stessa dimensione del training
     batch_size=32, # Lo stesso batch size del training
     class_mode='binary', # La stessa modalità di classe del training
     subset='validation' # Il sottoinsieme dei dati da usare come validazione
-)
+)   
 
 # Creo il modello della CNN con due hidden layers da 200 nodi l'uno
 model = keras.Sequential([
@@ -37,7 +40,8 @@ model = keras.Sequential([
     layers.MaxPooling2D((2, 2)), # Un layer di pooling che riduce la dimensione delle feature map di un fattore 2
     layers.Conv2D(64, (3, 3), activation='relu'), # Un altro layer convoluzionale con 64 filtri da 3x3 e funzione di attivazione ReLU
     layers.MaxPooling2D((2, 2)), # Un altro layer di pooling che riduce la dimensione delle feature map di un fattore 2
-    layers.Flatten(), # Un layer che appiattisce le feature map in un vettore unidimensionale
+    layers.Flatten(), # Un layer che appiattisce le feature map in un vettore unidimensionale 
+    layers.Dropout(0.5), # Aggiungo uno strato di dropout con una probabilità del 50% prima dello strato completamente connesso
     layers.Dense(200, activation='relu'), # Un layer denso (fully connected) con 200 nodi e funzione di attivazione ReLU (primo hidden layer)
     layers.Dense(200, activation='relu'), # Un altro layer denso con 200 nodi e funzione di attivazione ReLU (secondo hidden layer)
     layers.Dense(1, activation='sigmoid') # Un layer denso con un solo nodo e funzione di attivazione sigmoide (output layer)
@@ -60,9 +64,10 @@ checkpoint = keras.callbacks.ModelCheckpoint(
 )
 
 # Addestro il modello usando i generatori di immagini e la callback
-model.fit(
-    train_generator, # Il generatore di immagini di training
-    epochs=10, # Il numero di epoche da eseguire
-    validation_data=validation_generator, # Il generatore di immagini di validazione
-    callbacks=[checkpoint] # La lista delle callback da usare
-)
+with tf.device('/GPU:0'):
+    model.fit(
+        train_generator, # Il generatore di immagini di training
+        epochs=10, # Il numero di epoche da eseguire
+        validation_data=validation_generator, # Il generatore di immagini di validazione
+        callbacks=[checkpoint] # La lista delle callback da usare
+    )
