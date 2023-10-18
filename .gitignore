@@ -153,10 +153,11 @@ dmypy.json
 cython_debug/
 
 # Dataset
-dataset-serio/
+dataset*/
+*.zip
 
-# Modelli di prova
-best_model_no_dropout.h5
+# Modelli della rete (superano i 100MB)
+*.h5
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can

@@ -19,33 +19,40 @@ datagen = ImageDataGenerator(
 
 # Creo due generatori di flusso dalle cartelle delle immagini di training e validazione
 train_generator = datagen.flow_from_directory(
-    directory='dataset-serio/training', # La cartella che contiene le sottocartelle delle classi
+    directory='dataset/training', # La cartella che contiene le sottocartelle delle classi
     target_size=(256, 256), # La dimensione delle immagini da ridimensionare
     batch_size=32, # Il numero di immagini per ogni batch
     class_mode='binary', # La modalità di etichettatura delle classi (0 per coccodrillo, 1 per alligatore)
-    subset='training' # Il sottoinsieme dei dati da usare come training
 )
 
 validation_generator = datagen.flow_from_directory(
-    directory='dataset-serio/testing', # La stessa cartella del training
+    directory='dataset/validation', # La stessa cartella del training
     target_size=(256, 256), # La stessa dimensione del training
     batch_size=32, # Lo stesso batch size del training
     class_mode='binary', # La stessa modalità di classe del training
-    subset='validation' # Il sottoinsieme dei dati da usare come validazione
 )   
 
 # Creo il modello della CNN con due hidden layers da 200 nodi l'uno
 model = keras.Sequential([
-    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(256, 256, 3)), # Un layer convoluzionale con 32 filtri da 3x3 e funzione di attivazione ReLU
+    layers.Conv2D(16, (3, 3), activation='relu', input_shape=(256, 256, 3)), # Un layer convoluzionale con 16 filtri da 3x3 e funzione di attivazione ReLU
     layers.MaxPooling2D((2, 2)), # Un layer di pooling che riduce la dimensione delle feature map di un fattore 2
-    layers.Conv2D(64, (3, 3), activation='relu'), # Un altro layer convoluzionale con 64 filtri da 3x3 e funzione di attivazione ReLU
+    layers.Conv2D(32, (3, 3), activation='relu'), # Un altro layer convoluzionale con 32 filtri da 3x3 e funzione di attivazione ReLU
     layers.MaxPooling2D((2, 2)), # Un altro layer di pooling che riduce la dimensione delle feature map di un fattore 2
     layers.Flatten(), # Un layer che appiattisce le feature map in un vettore unidimensionale 
     layers.Dropout(0.5), # Aggiungo uno strato di dropout con una probabilità del 50% prima dello strato completamente connesso
-    layers.Dense(200, activation='relu'), # Un layer denso (fully connected) con 200 nodi e funzione di attivazione ReLU (primo hidden layer)
-    layers.Dense(200, activation='relu'), # Un altro layer denso con 200 nodi e funzione di attivazione ReLU (secondo hidden layer)
+    layers.Dense(100, activation='relu'), # Un layer denso (fully connected) con 100 nodi e funzione di attivazione ReLU (primo hidden layer)
+    layers.Dense(100, activation='relu'), # Un altro layer denso con 100 nodi e funzione di attivazione ReLU (secondo hidden layer)
     layers.Dense(1, activation='sigmoid') # Un layer denso con un solo nodo e funzione di attivazione sigmoide (output layer)
 ])
+
+# Impostazione del ciclo del learinig rate
+#lr_schedule = keras.optimizers.schedules.ExponentialDecay(
+#    initial_learning_rate=1e-2,
+#    decay_steps=10000,
+#    decay_rate=0.9)
+
+# Impostazione dell'ottimizzatore
+#opt = keras.optimizers.Adam(learning_rate=lr_schedule)
 
 # Compilo il modello specificando la funzione di perdita (loss), l'ottimizzatore e la metrica da monitorare
 model.compile(
