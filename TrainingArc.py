@@ -38,6 +38,10 @@ model = keras.Sequential([
     layers.MaxPooling2D((2, 2)), # Un layer di pooling che riduce la dimensione delle feature map di un fattore 2
     layers.Conv2D(32, (3, 3), activation='relu'), # Un altro layer convoluzionale con 32 filtri da 3x3 e funzione di attivazione ReLU
     layers.MaxPooling2D((2, 2)), # Un altro layer di pooling che riduce la dimensione delle feature map di un fattore 2
+    layers.Conv2D(128, (3, 3), activation='relu'), # Un altro layer convoluzionale con 64 filtri da 3x3 e funzione di attivazione ReLU
+    layers.MaxPooling2D((2, 2)), # Un altro layer di pooling che riduce la dimensione delle feature map di un fattore 2
+    layers.Conv2D(256, (3, 3), activation='relu'), # Un altro layer convoluzionale con 64 filtri da 3x3 e funzione di attivazione ReLU
+    layers.MaxPooling2D((2, 2)), # Un altro layer di pooling che riduce la dimensione delle feature map di un fattore 2
     layers.Flatten(), # Un layer che appiattisce le feature map in un vettore unidimensionale 
     layers.Dropout(0.5), # Aggiungo uno strato di dropout con una probabilità del 50% prima dello strato completamente connesso
     layers.Dense(100, activation='relu'), # Un layer denso (fully connected) con 100 nodi e funzione di attivazione ReLU (primo hidden layer)
@@ -57,7 +61,7 @@ model = keras.Sequential([
 # Compilo il modello specificando la funzione di perdita (loss), l'ottimizzatore e la metrica da monitorare
 model.compile(
     loss='binary_crossentropy', # La funzione di perdita per la classificazione binaria
-    optimizer='adam', # L'ottimizzatore Adam che adatta il tasso di apprendimento in base al gradiente
+    optimizer=keras.optimizers.Adam(learning_rate=0.001), # L'ottimizzatore Adam che adatta il tasso di apprendimento in base al gradiente
     metrics=['accuracy'] # La metrica da monitorare è l'accuratezza della classificazione
 )
 
@@ -74,7 +78,7 @@ checkpoint = keras.callbacks.ModelCheckpoint(
 with tf.device('/GPU:0'):
     model.fit(
         train_generator, # Il generatore di immagini di training
-        epochs=10, # Il numero di epoche da eseguire
+        epochs=20, # Il numero di epoche da eseguire
         validation_data=validation_generator, # Il generatore di immagini di validazione
         callbacks=[checkpoint] # La lista delle callback da usare
     )
