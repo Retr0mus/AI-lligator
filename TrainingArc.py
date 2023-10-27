@@ -74,7 +74,7 @@ checkpoint = keras.callbacks.ModelCheckpoint(
 with tf.device('/GPU:0'):
     model.fit(
         train_generator, # Il generatore di immagini di training
-        epochs=15, # Il numero di epoche da eseguire
+        epochs=10, # Il numero di epoche da eseguire
         validation_data=validation_generator, # Il generatore di immagini di validazione
         callbacks=[checkpoint] # La lista delle callback da usare
     )
