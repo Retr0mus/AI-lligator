@@ -7,7 +7,7 @@ from keras.preprocessing.image import img_to_array
 from sys import argv
 
 # Carica il modello
-model = keras.models.load_model("best_model_64.h5")
+model = keras.models.load_model("models\\best_model_64.h5")
 
 # Preparazione dell'immagine
 img = load_img(argv[1], target_size=(256, 256))
