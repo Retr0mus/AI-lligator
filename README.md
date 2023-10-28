@@ -59,7 +59,7 @@ This will give you the probability of the image being a crocodile one (if it's n
 
 
 
-### Athors
+### Authors
 
 Retr0mus: https://github.com/Retr0mus
 Singh-0: https://github.com/Singh-0
